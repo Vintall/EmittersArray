@@ -3,6 +3,8 @@ Shader "Custom/InterferenceShader"
     Properties
     {
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
+        _Max_amplitude_color ("Max Amplitude", Color) = (1,0,0)
+        _Min_amplitude_color ("Min Amplitude", Color) = (1,0,0)
     }
         SubShader
     {
@@ -28,8 +30,9 @@ Shader "Custom/InterferenceShader"
         float _Phase_shift;
         float _Wave_length;
         float _Wave_frequency;
+        half3 _Max_amplitude_color;
+        half3 _Min_amplitude_color;
         
-
         UNITY_INSTANCING_BUFFER_START(Props)
         UNITY_INSTANCING_BUFFER_END(Props)
 
@@ -48,11 +51,19 @@ Shader "Custom/InterferenceShader"
                 float r = length(xx);
 
                 float sin_clear = sin(r * 2 * pi / _Wave_length + i * (_Phase_shift * pi / 180) - _Time * _Wave_frequency);
-                float sin_handled = sin_clear * 2 / _Antenna_count;
+                float sin_handled = sin_clear / _Antenna_count;
 
                 s_all += sin_handled;
             }
-            o.Albedo = float3(s_all, 0, -s_all);
+            half3 max = _Max_amplitude_color * s_all;
+            half3 min = _Min_amplitude_color * (1 - s_all);
+
+
+            // -1     -0.34
+            // -0.33   0.33
+            //  0.34   1
+            o.Albedo = max + min;//lerp(_Min_amplitude_color, _Max_amplitude_color, (s_all + 1) / 2) * abs(s_all);
+            //o.Albedo = (s_all, 0, -s_all);
         }
         ENDCG
     }

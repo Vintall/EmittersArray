@@ -10,6 +10,10 @@ public class SettingsMenu : MonoBehaviour
     [SerializeField] UnityEngine.UI.Text frequency_max_value_label;
     [SerializeField] UnityEngine.UI.Text frequency_cur_value_label;
     [SerializeField] UnityEngine.UI.Slider frequency_slider;
+    [SerializeField] FlexibleColorPicker color_picker;
+    [SerializeField] UnityEngine.UI.Dropdown color_picker_dropdown;
+
+    
     public static SettingsMenu Instance
     {
         get
@@ -26,6 +30,7 @@ public class SettingsMenu : MonoBehaviour
         frequency_min_value_label.text = frequency_slider.minValue.ToString();
         frequency_max_value_label.text = frequency_slider.maxValue.ToString();
         frequency_cur_value_label.text = frequency_slider.value.ToString();
+
     }
     public void PrecisePlaneToggleChanged()
     {
@@ -35,5 +40,30 @@ public class SettingsMenu : MonoBehaviour
     {
         SimulationController.Instance.WaveFrequency = frequency_slider.value;
         frequency_cur_value_label.text = frequency_slider.value.ToString();
+    }
+    public void ColorPickerDropdownValueChanged()
+    {
+        if(color_picker_dropdown.value == 0)
+        {
+            color_picker.color = GameController.Instance.interferense_plane_material.GetColor("_Max_amplitude_color");
+        }
+        else
+        {
+            color_picker.color = GameController.Instance.interferense_plane_material.GetColor("_Min_amplitude_color");
+        }
+    }
+    public void ColorPickerColorChanged()
+    {
+        if (GameController.Instance.interferense_plane_material == null)
+            return;
+
+        if (color_picker_dropdown.value == 0)
+        {
+            GameController.Instance.interferense_plane_material.SetColor("_Max_amplitude_color", color_picker.color);
+        }
+        else
+        {
+            GameController.Instance.interferense_plane_material.SetColor("_Min_amplitude_color", color_picker.color);
+        }
     }
 }
