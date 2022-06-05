@@ -50,7 +50,7 @@ Shader "Custom/InterferenceShader"
                 float2 xx = uv - buff;
                 float r = length(xx);
 
-                float sin_clear = sin(r * 2 * pi / _Wave_length + i * (_Phase_shift * pi / 180) - _Time * _Wave_frequency);
+                float sin_clear = sin(r * 2 * pi / _Wave_length + i * (_Phase_shift * pi / 180) - _Time * 20 * (2 * pi) * _Wave_frequency);
                 float sin_handled = sin_clear / _Antenna_count;
 
                 s_all += sin_handled;
@@ -58,12 +58,7 @@ Shader "Custom/InterferenceShader"
             half3 max = _Max_amplitude_color * s_all;
             half3 min = _Min_amplitude_color * (1 - s_all);
 
-
-            // -1     -0.34
-            // -0.33   0.33
-            //  0.34   1
-            o.Albedo = max + min;//lerp(_Min_amplitude_color, _Max_amplitude_color, (s_all + 1) / 2) * abs(s_all);
-            //o.Albedo = (s_all, 0, -s_all);
+            o.Albedo = max + min;
         }
         ENDCG
     }

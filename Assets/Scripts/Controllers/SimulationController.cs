@@ -43,7 +43,7 @@ public class SimulationController : MonoBehaviour
 
         float distance = AntennaArrayController.Instance.AntennasDistance;
 
-        float phase_shift = 360 * distance * Mathf.Sin(rotation_angle * Mathf.Deg2Rad) / wave_length; //
+        float phase_shift = 360 * distance * Mathf.Sin(rotation_angle * Mathf.Deg2Rad) / wave_length;
         
         Transform antenna = AntennaArrayController.Instance.transform.GetChild(0);
         cur_material = plane.GetComponent<MeshRenderer>().material;
@@ -51,14 +51,9 @@ public class SimulationController : MonoBehaviour
         List<Vector4> antenna_pos = new List<Vector4>();
 
         for (int i = 0; i < 100; i++)
-        {
             antenna_pos.Add(Vector4.zero);
-        }
-
         for (int i = 0; i < antenna.childCount; i++)
-        {
             antenna_pos[i] = new Vector4(antenna.GetChild(i).position.x, antenna.GetChild(i).position.z, 0, 0);
-        }
 
         cur_material.SetInt("_Antenna_count", antenna.childCount);
         cur_material.SetVectorArray("_Antenna_position", antenna_pos);
@@ -68,11 +63,12 @@ public class SimulationController : MonoBehaviour
 
         cur_material.SetVector("_Sheet_position", new Vector4(plane.transform.position.x, plane.transform.position.z, 0, 0));
         cur_material.SetFloat("_Sheet_size", 100);
-
+        #region Log
         Debug.Log("_Antenna_count: " + antenna.childCount);
         Debug.Log("_Phase_shift: " + phase_shift);
         Debug.Log("_Wave_length: " + wave_length);
         Debug.Log("_Sheet_position: " + new Vector4(plane.transform.position.x, plane.transform.position.z, 0, 0));
         Debug.Log("_Sheet_size: " + 100);
+        #endregion
     }
 }
