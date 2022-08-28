@@ -4,39 +4,20 @@ using UnityEngine;
 
 public class AntennaArrayController : MonoBehaviour
 {
-    static AntennaArrayController instance;
-    int antennas_count;
-    float antennas_distance;
+    [SerializeField] AntennaArray antenna_array;
 
-    public int AntennasCount
-    {
-        get
-        {
-            return antennas_count;
-        }
-    }
-    public float AntennasDistance
-    {
-        get
-        {
-            return antennas_distance;
-        }
-    }
-    public static AntennaArrayController Instance
-    {
-        get
-        {
-            return instance;
-        }
-    }
+    static AntennaArrayController instance;
+    public static AntennaArrayController Instance => instance;
+
     private void Awake()
     {
-        instance = this;
+        if (instance == null)
+            instance = this;
     }
-    public void GenerateAntennaArray(int count, float distance)
+
+    public void GenerateAntennaArray()
     {
-        antennas_count = count;
-        antennas_distance = distance;
-        transform.GetChild(0).GetComponent<AntennaArray>().GenerateAntennaArray(count, distance);
+        antenna_array.GenerateAntennaArray();
+        
     }
 }

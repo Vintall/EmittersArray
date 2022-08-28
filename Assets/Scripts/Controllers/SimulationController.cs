@@ -4,19 +4,18 @@ using UnityEngine;
 
 public class SimulationController : MonoBehaviour
 {
+    static SimulationController instance;
+    public static SimulationController Instance => instance;
+
     [SerializeField] AntennaArray antenna;
     [SerializeField] InterferencePlane plane;
-    static SimulationController instance;
+
     float wave_length;
     float rotation_angle;
     float wave_frequency;
-
     public float WaveFrequency
     {
-        get
-        {
-            return wave_frequency;
-        }
+        get => wave_frequency;
         set
         {
             wave_frequency = value;
@@ -25,13 +24,6 @@ public class SimulationController : MonoBehaviour
     }
 
     Material cur_material;
-    public static SimulationController Instance
-    {
-        get
-        {
-            return instance;
-        }
-    }
     public void Awake()
     {
         instance = this;
@@ -41,7 +33,7 @@ public class SimulationController : MonoBehaviour
         this.wave_length = wave_length;
         this.rotation_angle = rotation_angle;
 
-        float distance = AntennaArrayController.Instance.AntennasDistance;
+        float distance = (float)SettingsController.Instance.DistanceBetweenEmitters;
 
         float phase_shift = 360 * distance * Mathf.Sin(rotation_angle * Mathf.Deg2Rad) / wave_length;
         

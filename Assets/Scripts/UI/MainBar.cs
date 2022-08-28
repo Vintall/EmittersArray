@@ -4,47 +4,41 @@ using UnityEngine;
 
 public class MainBar : MonoBehaviour
 {
-    static MainBar instance;
+    [SerializeField] CurMenuHolder cur_menu_holder_instance;
     
-    public static MainBar Instance
+    #region ButtonEvents
+    public void CloseMenuPressed()
     {
-        get
-        {
-            return instance;
-        }
+        cur_menu_holder_instance.CloseAll();
+        UIController.Instance.OpenMainUI();
     }
-    private void Awake()
+    public void ResetMenuPressed()
     {
-        instance = this;
-        
+        cur_menu_holder_instance.OpenResetAllPage();
     }
-    private void Start()
+    public void PhasedArrayGenerationMenuPressed()
     {
-        CloseAll();
+        cur_menu_holder_instance.OpenPhasedArrayGenerationPage();
     }
-    void CloseAll()
+    public void FieldPressed()
     {
-        SimulationControllerMenu.Instance.gameObject.SetActive(false);
-        AntennaArrayControllerMenu.Instance.gameObject.SetActive(false);
-        SettingsMenu.Instance.gameObject.SetActive(false);
+        cur_menu_holder_instance.OpenFieldPage();
     }
-    public void GoToMainProgramButtonPressed()
+    public void MonitoringPressed()
     {
-        CloseAll();
+        cur_menu_holder_instance.OpenMonitoringPage();
     }
-    public void AntennaArrayControllerMenuButtonPressed()
+    public void SimulationPressed()
     {
-        CloseAll();
-        AntennaArrayControllerMenu.Instance.gameObject.SetActive(true);
+        cur_menu_holder_instance.OpenSimulationPage();
     }
-    public void SimulationControllerMenuButtonPressed()
+    public void CameraPressed()
     {
-        CloseAll();
-        SimulationControllerMenu.Instance.gameObject.SetActive(true);
+        cur_menu_holder_instance.OpenCameraPage();
     }
-    public void SettingsMenuButtonPressed()
+    public void PreferencesPressed()
     {
-        CloseAll();
-        SettingsMenu.Instance.gameObject.SetActive(true);
+        cur_menu_holder_instance.OpenPreferencesPage();
     }
+#endregion
 }

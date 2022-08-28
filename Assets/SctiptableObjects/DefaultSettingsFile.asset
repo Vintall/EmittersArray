@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15439a955c71af64ca3fc295feabadd4, type: 3}
+  m_Name: DefaultSettingsFile
+  m_EditorClassIdentifier: 
+  free_cam: 1
+  crosshair: 1
+  time_scale: 1
+  emitters_count: 1
+  max_emitting: 0
+  min_emitting: 0
+  emitting_on_crosshair: 1
+  field_width: 2000
+  field_height: 2000
+  antennas_count: 80
+  wave_length: 1
+  distance_between_emitters: 0.1
