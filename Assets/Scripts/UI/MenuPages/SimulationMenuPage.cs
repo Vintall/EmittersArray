@@ -8,18 +8,18 @@ public class SimulationMenuPage : MonoBehaviour, IMenuPage
     #region TimeScale
     [SerializeField] UnityEngine.UI.InputField time_scale;
     bool time_scale_was_changed = false;
-    public double TimeScale
+    public float TimeScale
     {
         get
         {
             try
             {
-                double result = double.Parse(time_scale.text.Replace('.', ','));
+                float result = float.Parse(time_scale.text.Replace('.', ','));
                 return result;
             }
             catch
             {
-                double default_time_scale = SettingsController.Instance.DefaultSettings.time_scale;
+                float default_time_scale = SettingsController.Instance.DefaultSettings.time_scale;
                 time_scale.text = default_time_scale.ToString();
                 return default_time_scale;
             }
@@ -40,7 +40,6 @@ public class SimulationMenuPage : MonoBehaviour, IMenuPage
             SettingsController.Instance.TimeScale = TimeScale;
             time_scale_was_changed = false;
         }
-        
     }
     void ResetToDefault()
     {

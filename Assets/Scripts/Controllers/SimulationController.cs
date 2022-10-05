@@ -7,7 +7,7 @@ public class SimulationController : MonoBehaviour
     static SimulationController instance;
     public static SimulationController Instance => instance;
 
-    [SerializeField] AntennaArray antenna;
+    [SerializeField] EmittersArray antenna;
     [SerializeField] InterferencePlane plane;
 
     float wave_length;
@@ -33,11 +33,11 @@ public class SimulationController : MonoBehaviour
         this.wave_length = wave_length;
         this.rotation_angle = rotation_angle;
 
-        float distance = (float)SettingsController.Instance.DistanceBetweenEmitters;
+        float distance = 0;// (float)SettingsController.Instance.DistanceBetweenEmitters; --------------------
 
         float phase_shift = 360 * distance * Mathf.Sin(rotation_angle * Mathf.Deg2Rad) / wave_length;
-        
-        Transform antenna = AntennaArrayController.Instance.transform.GetChild(0);
+
+        Transform antenna = null;// = AntennaArrayController.Instance.transform.GetChild(0);
         cur_material = plane.GetComponent<MeshRenderer>().material;
         
         List<Vector4> antenna_pos = new List<Vector4>();

@@ -16,10 +16,6 @@ public class MainBar : MonoBehaviour
     {
         cur_menu_holder_instance.OpenResetAllPage();
     }
-    public void PhasedArrayGenerationMenuPressed()
-    {
-        cur_menu_holder_instance.OpenPhasedArrayGenerationPage();
-    }
     public void FieldPressed()
     {
         cur_menu_holder_instance.OpenFieldPage();

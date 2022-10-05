@@ -8,9 +8,9 @@ public class SettingsController : MonoBehaviour
     [SerializeField] DefaultSettingsScriptableObject default_settings;
     public DefaultSettingsScriptableObject DefaultSettings => default_settings;
 
-    const string DefaultFolderName = "SettingsPresets";
-    const string DefaultFileName = "SettingsPreset1";
-    
+    const string DefaultFolderName = "JsonFiles";
+    const string DefaultFileName = "SettingsControllerSave";
+
     static SettingsController instance;
     public static SettingsController Instance => instance;
     private void Awake()
@@ -18,168 +18,203 @@ public class SettingsController : MonoBehaviour
         if (instance == null)
             instance = this;
     }
-    public void LoadSettingsFromFile(string file_name)
+    private void OnApplicationQuit()
     {
-        Path.Combine(Application.dataPath, DefaultFolderName, DefaultFileName);
+        SaveSettingsToFile();
     }
-    public void SaveSettingsToFile(string file_name)
+    private void Start()
     {
-        
+        LoadSettingsFromFile();
     }
+    public void LoadSettingsFromFile()
+    {
+        Debug.Log("Load Settings From JSON");
+        if (!File.Exists(SaveFilePath))
+        {
+            LoadDefaultSettings();
+            Debug.Log("Failed to load. Applying default.");
+            return;
+        }
+
+        string json = File.ReadAllText(SaveFilePath);
+        SettingsControllerJSONFormat json_obj = JsonUtility.FromJson<SettingsControllerJSONFormat>(json);
+
+        FreeCam = json_obj.free_cam;
+        Crosshair = json_obj.crosshair;
+
+        TimeScale = json_obj.time_scale;
+
+        MonitoringEmittersCount = json_obj.monitoring_emitters_count;
+        MonitoringMinEmitting = json_obj.monitoring_min_emitting;
+        MonitoringMaxEmitting = json_obj.monitoring_max_emitting;
+        MonitoringEmittingOnCrosshair = json_obj.monitoring_emitting_on_crosshair;
+
+        FieldWidth = json_obj.field_width;
+        FieldHeight = json_obj.field_height;
+
+    }
+    public void SaveSettingsToFile()
+    {
+        SettingsControllerJSONFormat json_format = new SettingsControllerJSONFormat(Instance);
+        string json = JsonUtility.ToJson(json_format);
+
+        if (!Directory.Exists(SaveFileDirectory))
+            Directory.CreateDirectory(SaveFileDirectory);
+
+        File.Create(SaveFilePath).Dispose();
+
+        File.WriteAllText(SaveFilePath, json);
+
+        Debug.Log("Save Settings To JSON");
+    }
+
+    string SaveFilePath => Path.Combine(SaveFileDirectory, DefaultFileName);
+    string SaveFileDirectory => Path.Combine(Application.dataPath, DefaultFolderName);
     public void LoadDefaultSettings()
     {
         FreeCam = DefaultSettings.free_cam;
         Crosshair = DefaultSettings.crosshair;
+
         TimeScale = DefaultSettings.time_scale;
+
+        MonitoringEmittersCount = DefaultSettings.monitoring_emitters_count;
+        MonitoringMinEmitting = DefaultSettings.monitoring_min_emitting;
+        MonitoringMaxEmitting = DefaultSettings.monitoring_max_emitting;
+        MonitoringEmittingOnCrosshair = DefaultSettings.monitoring_emitting_on_crosshair;
+
+        FieldWidth = DefaultSettings.field_width;
+        FieldHeight = DefaultSettings.field_height;
+
     }
 
     #region Variables
 
     #region FreeCam
-    [SerializeField] bool free_cam;
+    [SerializeField, SerializeProperty("FreeCam")]
+    bool free_cam;
     public bool FreeCam
     {
         get => free_cam;
         set
         {
+            bool prev = free_cam;
             free_cam = value;
-            Debug.Log("free_cam");
+            Debug.Log("FreeCam: " + prev + " ==> " + free_cam);
         }
     }
     #endregion
     #region Crosshair
-    [SerializeField] bool crosshair;
+    [SerializeField, SerializeProperty("Crosshair")]
+    bool crosshair;
     public bool Crosshair
     {
         get => crosshair;
         set
         {
+            bool prev = crosshair;
             crosshair = value;
-            Debug.Log("crosshair");
+            Debug.Log("Crosshair: " + prev + " ==> " + crosshair);
         }
     }
     #endregion
 
     #region TimeScale
-    [SerializeField] double time_scale;
-    public double TimeScale
+    [SerializeField, SerializeProperty("TimeScale")]
+    float time_scale;
+    public float TimeScale
     {
         get => time_scale;
         set
         {
+            float prev = time_scale;
             time_scale = value;
-            Debug.Log("time_scale");
+            Debug.Log("TimeScale: " + prev + " ==> " + time_scale);
         }
     }
     #endregion
 
     #region MonitoringEmittersCount
-    [SerializeField] bool monitoring_emitters_count;
+    [SerializeField, SerializeProperty("MonitoringEmittersCount")]
+    bool monitoring_emitters_count;
     public bool MonitoringEmittersCount
     {
         get => monitoring_emitters_count;
         set
         {
+            bool prev = monitoring_emitters_count;
             monitoring_emitters_count = value;
-            Debug.Log("monitoring_emitters_count");
+            Debug.Log("MonitoringEmittersCount");
         }
     }
     #endregion
     #region MonitoringMinEmitting
-    [SerializeField] bool monitoring_min_emitting;
+    [SerializeField, SerializeProperty("MonitoringMinEmitting")]
+    bool monitoring_min_emitting;
     public bool MonitoringMinEmitting
     {
         get => monitoring_min_emitting;
         set
         {
+            bool prev = monitoring_min_emitting;
             monitoring_min_emitting = value;
-            Debug.Log("monitoring_min_emitting");
+            Debug.Log("MonitoringMinEmitting: " + prev + " ==> " + monitoring_min_emitting);
         }
     }
     #endregion
     #region MonitoringMaxEmitting
-    [SerializeField] bool monitoring_max_emitting;
+    [SerializeField, SerializeProperty("MonitoringMaxEmitting")]
+    bool monitoring_max_emitting;
     public bool MonitoringMaxEmitting
     {
         get => monitoring_max_emitting;
         set
         {
+            bool prev = MonitoringMaxEmitting;
             monitoring_max_emitting = value;
-            Debug.Log("monitoring_max_emitting");
+            Debug.Log("MonitoringMaxEmitting: " + prev + " ==> " + monitoring_max_emitting);
         }
     }
     #endregion
     #region MonitoringEmittingOnCrosshair
-    [SerializeField] bool monitoring_emitting_on_crosshair;
+    [SerializeField, SerializeProperty("MonitoringEmittingOnCrosshair")]
+    bool monitoring_emitting_on_crosshair;
     public bool MonitoringEmittingOnCrosshair
     {
         get => monitoring_emitting_on_crosshair;
         set
         {
+            bool prev = monitoring_emitting_on_crosshair;
             monitoring_emitting_on_crosshair = value;
-            Debug.Log("monitoring_emitting_on_crosshair");
+            Debug.Log("MonitoringEmittingOnCrosshair: " + prev + " ==> " + monitoring_emitting_on_crosshair);
         }
     }
     #endregion
 
     #region FieldWidth
-    [SerializeField] int field_width;
+    [SerializeField, SerializeProperty("FieldWidth")]
+    int field_width;
     public int FieldWidth
     {
         get => field_width;
         set
         {
+            int prev = field_width;
             field_width = value;
-            Debug.Log("field_width");
+            Debug.Log("FieldWidth: " + prev + " ==> " + field_width);
         }
     }
     #endregion
     #region FieldHeight
-    [SerializeField] int field_height;
+    [SerializeField, SerializeProperty("FieldHeight")]
+    int field_height;
     public int FieldHeight
     {
         get => field_height;
         set
         {
+            int prev = field_height;
             field_height = value;
-            Debug.Log("field_height");
-        }
-    }
-    #endregion
-
-    #region AntennasCount
-    [SerializeField] int antennas_count;
-    public int AntennasCount
-    {
-        get => antennas_count;
-        set
-        {
-            antennas_count = value;
-            Debug.Log("antennas_count");
-        }
-    }
-    #endregion
-    #region WaveLength
-    [SerializeField] double wave_length;
-    public double WaveLength
-    {
-        get => wave_length;
-        set
-        {
-            wave_length = value;
-            Debug.Log("wave_length");
-        }
-    }
-    #endregion
-    #region DistanceBetweenEmitters
-    [SerializeField] double distance_between_emitters;
-    public double DistanceBetweenEmitters
-    {
-        get => distance_between_emitters;
-        set
-        {
-            distance_between_emitters = value;
-            Debug.Log("distance_between_emitters");
+            Debug.Log("FieldHeight: " + prev + " ==> " + field_height);
         }
     }
     #endregion
@@ -199,21 +234,15 @@ public class SettingsController : MonoBehaviour
     }
     public void ResetMonitoringPage()
     {
-        MonitoringEmittersCount = DefaultSettings.emitters_count;
-        MonitoringEmittingOnCrosshair = DefaultSettings.emitting_on_crosshair;
-        MonitoringMaxEmitting = DefaultSettings.max_emitting;
-        MonitoringMinEmitting = DefaultSettings.min_emitting;
+        MonitoringEmittersCount = DefaultSettings.monitoring_emitters_count;
+        MonitoringEmittingOnCrosshair = DefaultSettings.monitoring_emitting_on_crosshair;
+        MonitoringMaxEmitting = DefaultSettings.monitoring_max_emitting;
+        MonitoringMinEmitting = DefaultSettings.monitoring_min_emitting;
     }
     public void ResetFieldPage()
     {
         FieldWidth = DefaultSettings.field_width;
         FieldHeight = DefaultSettings.field_height;
-    }
-    public void ResetPhasedArrayGenerationPage()
-    {
-        AntennasCount = DefaultSettings.antennas_count;
-        WaveLength = DefaultSettings.wave_length;
-        DistanceBetweenEmitters = DefaultSettings.distance_between_emitters;
     }
     #endregion
 }

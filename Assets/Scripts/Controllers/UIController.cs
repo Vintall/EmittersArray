@@ -6,6 +6,11 @@ public class UIController : MonoBehaviour
 {
     [SerializeField] GameObject menu_ui_gameObject;
     [SerializeField] GameObject main_ui_gameObject;
+    [SerializeField] GameObject active_game_ui_windows;
+
+    public GameObject MenuUIGameObject => menu_ui_gameObject;
+    public GameObject MainUIGameObject => main_ui_gameObject;
+    public GameObject ActiveGameUIWindows => active_game_ui_windows;
 
     static UIController instance;
     public static UIController Instance => instance;

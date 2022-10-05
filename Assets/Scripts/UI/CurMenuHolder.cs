@@ -11,7 +11,6 @@ public class CurMenuHolder : MonoBehaviour
         menu_pages = new List<IMenuPage>()
         {
             reset_all_page,
-            phased_array_generation_page,
             field_page,
             monitoring_page,
             simulation_page,
@@ -36,16 +35,6 @@ public class CurMenuHolder : MonoBehaviour
     {
         CloseAll();
         reset_all_page.ActivateGameObject();
-    }
-    #endregion
-
-    #region PhasedArrayGenerationPage
-    [SerializeField] PhasedArrayGenerationMenuPage phased_array_generation_page;
-    public PhasedArrayGenerationMenuPage PhasedArrayGenerationPage => phased_array_generation_page;
-    public void OpenPhasedArrayGenerationPage()
-    {
-        CloseAll();
-        phased_array_generation_page.ActivateGameObject();
     }
     #endregion
 
