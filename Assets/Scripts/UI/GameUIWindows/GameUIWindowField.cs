@@ -7,7 +7,8 @@ public class GameUIWindowField : MonoBehaviour
     public enum FieldType // If I'll ever need to cast this class to child
     {
         Int,
-        Float
+        Float,
+        Bool
     }
     protected FieldType field_type;
     public FieldType GetFieldType => field_type;

@@ -5,153 +5,115 @@ using UnityEngine.UI;
 
 public class PreferencesMenuPage : MonoBehaviour, IMenuPage
 {
-    [System.Serializable]
-    struct MyKey //Next time should do it through dictionary...  0_0
+    static PreferencesMenuPage instance;
+    public static PreferencesMenuPage Instance => instance;
+    private void Awake()
     {
-        KeyCode key;
-        [SerializeField] Text ui_representing;
-        public KeyCode Key
+        instance = this;
+    }
+    List<PreferencesSheet> sheets = null;
+    public List<PreferencesSheet> Sheets
+    { 
+        get
         {
-            get => key;
-            set
-            {
-                key = value;
-                ui_representing.text = key.ToString();
-            }
-        }
-        public Text UiRepresenting => ui_representing;
-        bool was_changed;
-        public bool WasChanged
-        {
-            get => was_changed;
-            set
-            {
-                was_changed = value;
-                ui_representing.text = "";
-            }
+            if (sheets == null)
+                InitializePreferencesMenuPage();
+
+            return sheets;
         }
     }
-    [SerializeField] MyKey move_forward;
-    [SerializeField] MyKey move_left;
-    [SerializeField] MyKey move_right;
-    [SerializeField] MyKey move_back;
 
+    List<PreferenceField> all_fields = null;
+    public List<PreferenceField> AllFields
+    {
+        get
+        { //Fields list can not be changed after initialization. So, I can collect all of the fields onse, copy it, and then use copy.
+            if (all_fields != null)
+                return all_fields;
 
+            List<PreferenceField> result = new List<PreferenceField>();
+
+            foreach(PreferencesSheet sheet in Sheets)
+                result.AddRange(sheet.Fields);
+
+            return result;
+        }
+    }
+    string current_action_on_change = "";
+    public void OnStartChanging(string action_name)
+    {
+        LockPreferencesStartChanging();
+        current_action_on_change = action_name;
+        InputController.Instance.GoToActionPattern("Preferences Changing");
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+    public void ReceiveKey(KeyCode key)
+    {
+        foreach(PreferenceField field in AllFields)
+            if(field.ActionName == current_action_on_change)
+            {
+                PreferencesController.Instance.ActionsKeys[current_action_on_change] = key;
+
+                field.InitializeField();
+                break;
+            }
+
+        current_action_on_change = "";
+        UnLockPreferencesStartChanging();
+    }
+    public void CalcelChanging()
+    {
+        foreach (PreferenceField field in AllFields)
+            if (field.ActionName == current_action_on_change)
+            {
+                field.InitializeField();
+                break;
+            }
+        current_action_on_change = "";
+        UnLockPreferencesStartChanging();
+    }
+    public void LockPreferencesStartChanging()
+    {// Locks changing entry on every field. This happens, when one field currently choosed for changing
+        foreach (PreferenceField field in AllFields)
+            field.LockChanging();
+
+        
+    }
+    public void UnLockPreferencesStartChanging()
+    {// UnLocks changing entry on every field. Now we can choose preference, we wanna change, by pressing on changing entry.
+        foreach (PreferenceField field in AllFields)
+            field.UnLockChanging();
+
+        InputController.Instance.GoToActionPattern("Menu UI");
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
     private void Start()
     {
-        
+        InitializePreferencesMenuPage();
     }
     private void Update()
     {
-        InputChecker();
-    }
-    void InputChecker()
-    {
-        if (!input_checker_allowed)
-            return;
-
-        foreach (KeyCode key in System.Enum.GetValues(typeof(KeyCode))) //Check for all buttons
-            if (Input.GetKeyDown(key))
-            {
-                if ((int)key >= 323 && (int)key <= 329) //Cut off mouse actions capture
-                    continue;
-
-                if (key == KeyCode.Escape)
-                {
-                    input_checker_allowed = false;
-                    return;
-                }
-
-                input_checker_allowed = false;
-                SendKey(key);
-                return;
-            }
-    }
-    string current_command = "";
-    bool input_checker_allowed = false;
-
-    void SendKey(KeyCode key)
-    {
-        switch (current_command)
-        {
-            case "Move forward":
-                move_forward.Key = key;
-                break;
-            case "Move left":
-                move_left.Key = key;
-                break;
-            case "Move back":
-                move_back.Key = key;
-                break;
-            case "Move right":
-                move_right.Key = key;
-                break;
-        }
-        current_command = "";
-    }
-
-    #region UIInteractions
-    public void ChangePreferenceClick(string command) 
-    {
-        if (input_checker_allowed)
-            return;
-
-        current_command = command;
-        switch (command)
-        {
-            case "Move forward":
-                move_forward.WasChanged = true;
-                break;
-            case "Move left":
-                move_left.WasChanged = true;
-                break;
-            case "Move back":
-                move_back.WasChanged = true;
-                break;
-            case "Move right":
-                move_right.WasChanged = true;
-                break;
-        }
         
-        input_checker_allowed = true;
     }
-    public void ConfirmChangesButtonPressed()
-    {
-        if (move_forward.WasChanged)
-            PreferencesController.Instance.MoveForward = move_forward.Key;
+    [SerializeField] Transform content;
 
-        if (move_left.WasChanged)
-            PreferencesController.Instance.MoveLeft = move_left.Key;
+    public void InitializePreferencesMenuPage()
+    {//Pre-Initialization from default preferences (Only place, where all of the preferences is defined by hands)
+        sheets = new List<PreferencesSheet>();
 
-        if (move_back.WasChanged)
-            PreferencesController.Instance.MoveBack = move_back.Key;
+        PreferencesSheet sheet_obj;
+        foreach (DefaultPreferencesScriptableObject.InputSheet sheet in PreferencesController.Instance.DefaultPreferences.input_sheets)
+        {
+            sheet_obj = Instantiate(AssetHolder.Instance.PreferencesSheet, content).GetComponent<PreferencesSheet>();
+            sheet_obj.InitializePreferencesSheet(sheet);
 
-        if (move_right.WasChanged)
-            PreferencesController.Instance.MoveRight = move_right.Key;
-
-        ClearAllSwitches();
-        LoadFromController();
-    }
-    public void ResetToDefaultButtonPressed()
-    {
-        PreferencesController.Instance.ResetPreferencesMenu();
-        LoadFromController();
-    }
-    #endregion
-
-    void LoadFromController()
-    {
-        move_forward.Key = PreferencesController.Instance.MoveForward;
-        move_left.Key = PreferencesController.Instance.MoveLeft;
-        move_back.Key = PreferencesController.Instance.MoveBack;
-        move_right.Key = PreferencesController.Instance.MoveRight;
-    }
-    void ClearAllSwitches()
-    {
-        move_forward.WasChanged = false; 
-        move_left.WasChanged = false;
-        move_back.WasChanged = false;
-        move_right.WasChanged = false;
+            sheets.Add(sheet_obj);
+        }
+        Instantiate(AssetHolder.Instance.PreferencesResetField, content);
     }
     public void ActivateGameObject()
     {
@@ -166,7 +128,6 @@ public class PreferencesMenuPage : MonoBehaviour, IMenuPage
 
     public void LoadOnActivation()
     {
-        ClearAllSwitches();
-        LoadFromController();
+        
     }
 }

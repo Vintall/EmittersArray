@@ -23,14 +23,14 @@ public class UIController : MonoBehaviour
     {
         main_ui_gameObject.SetActive(true);
         menu_ui_gameObject.SetActive(false);
+
+        InputController.Instance.GoToActionPattern("Main UI");
     }
     public void OpenMenuUI()
     {
         menu_ui_gameObject.SetActive(true);
         main_ui_gameObject.SetActive(false);
+
+        InputController.Instance.GoToActionPattern("Menu UI");
     }
-
-
-
-    
 }

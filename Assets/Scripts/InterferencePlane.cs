@@ -6,6 +6,6 @@ public class InterferencePlane : MonoBehaviour
 {
     private void Start()
     {
-        GameController.Instance.interferense_plane_material = GetComponent<MeshRenderer>().material;
+        
     }
 }

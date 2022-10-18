@@ -7,17 +7,10 @@ using UnityEngine;
 /// </summary>
 public class PreferencesControllerJSONFormat
 {
-    public KeyCode move_forward;
-    public KeyCode move_right;
-    public KeyCode move_left;
-    public KeyCode move_back;
-
+    public Dictionary<string, KeyCode> actions_key;
 
     public PreferencesControllerJSONFormat(PreferencesController obj)
     {
-        move_forward = obj.MoveForward;
-        move_left = obj.MoveLeft;
-        move_right = obj.MoveRight;
-        move_back = obj.MoveBack;
+        actions_key = new Dictionary<string, KeyCode>(obj.ActionsKeys);
     }
 }

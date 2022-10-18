@@ -14,6 +14,9 @@ Shader "Custom/InterferenceShader"
         #pragma surface surf Standard //fullforwardshadows
         #pragma target 3.0
 
+#define max_antennas_count 100
+#define PI 3.1415926
+
         float2 _MainTex;
 
         struct Input
@@ -21,42 +24,54 @@ Shader "Custom/InterferenceShader"
             float2 uv_MainTex;
         };
 
-        float2 _Sheet_position;
-        float _Sheet_size;
+        float2 _sheet_position;
+        float _sheet_size;
 
-        int _Antenna_count;
-        float2 _Antenna_position[100];
-        
-        float _Phase_shift;
-        float _Wave_length;
-        float _Wave_frequency;
-        half3 _Max_amplitude_color;
-        half3 _Min_amplitude_color;
+        int _antenna_count;
+
+        float2 _positions[max_antennas_count];
+        float _wave_length[max_antennas_count];
+        float _wave_period[max_antennas_count];
+        float _phase_shift[max_antennas_count];
+
+        half3 _max_amplitude_color;
+        half3 _min_amplitude_color;
         
         UNITY_INSTANCING_BUFFER_START(Props)
         UNITY_INSTANCING_BUFFER_END(Props)
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-            const float pi = 3.1415926;
-            float s_all = 0;
-            float2 uv = -(IN.uv_MainTex - 0.5) * _Sheet_size + _Sheet_position;
-            for (int i = 0; i < 100; i+=1)
+            float result = 0;
+
+            float2 uv = -(IN.uv_MainTex - 0.5) * _sheet_size + _sheet_position; // pixel world position
+
+            float amplitude = 1. / _antenna_count;   // aka 'A'
+            float wave_number;                      // aka 'k' in math
+            float angular_frequency;                // aka 'w' in math
+            float radius;                           // distance from emitter to any interference point
+
+            for (int i = 0; i < max_antennas_count; i++)
             {
-                if (i >= _Antenna_count)
+                if (i >= _antenna_count)
                     break;
 
-                half2 buff = _Antenna_position[i];
-                float2 xx = uv - buff;
-                float r = length(xx);
+                if (_wave_length[i] == 0 || _wave_period[i] == 0)
+                    continue;
 
-                float sin_clear = sin(r * 2 * pi / _Wave_length + i * (_Phase_shift * pi / 180) - _Time * 20 * (2 * pi) * _Wave_frequency);
-                float sin_handled = sin_clear / _Antenna_count;
+                radius = length(uv - _positions[i]);
+                wave_number = 2 * PI / _wave_length[i];
+                angular_frequency = 2 * PI / _wave_period[i];
+                
 
-                s_all += sin_handled;
+                float real_time = _Time * 20; // Make a '1' equal to second
+
+                float sin_clear = amplitude * sin(wave_number * radius - real_time * angular_frequency + _phase_shift[i]); // energy from current emitter
+
+                result += sin_clear;
             }
-            half3 max = _Max_amplitude_color * s_all;
-            half3 min = _Min_amplitude_color * (1 - s_all);
+            half3 max = _max_amplitude_color * result;
+            half3 min = _min_amplitude_color * (1 - result);
 
             o.Albedo = max + min;
         }

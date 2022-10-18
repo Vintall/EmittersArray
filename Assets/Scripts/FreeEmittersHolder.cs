@@ -11,7 +11,7 @@ public class FreeEmittersHolder : MonoBehaviour
     public static FreeEmittersHolder Instance => instance;
     private void Awake()
     {
-        if (instance = null)
+        if (instance == null)
             instance = this;
     }
 }

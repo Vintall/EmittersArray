@@ -6,61 +6,61 @@ public class SimulationController : MonoBehaviour
 {
     static SimulationController instance;
     public static SimulationController Instance => instance;
-
-    [SerializeField] EmittersArray antenna;
-    [SerializeField] InterferencePlane plane;
-
-    float wave_length;
-    float rotation_angle;
-    float wave_frequency;
-    public float WaveFrequency
-    {
-        get => wave_frequency;
-        set
-        {
-            wave_frequency = value;
-            cur_material.SetFloat("_Wave_frequency", value);
-        }
-    }
-
-    Material cur_material;
     public void Awake()
     {
-        instance = this;
+        if (instance == null)
+            instance = this;
     }
-    public void Emit(float wave_length, float rotation_angle)
+
+    [SerializeField] InterferencePlane plane;
+    [SerializeField] Material plane_material = null;
+    public Material PlaneMaterial
     {
-        this.wave_length = wave_length;
-        this.rotation_angle = rotation_angle;
+        get
+        {
+            if (plane_material == null)
+                plane_material = plane.GetComponent<MeshRenderer>().material;
 
-        float distance = 0;// (float)SettingsController.Instance.DistanceBetweenEmitters; --------------------
-
-        float phase_shift = 360 * distance * Mathf.Sin(rotation_angle * Mathf.Deg2Rad) / wave_length;
-
-        Transform antenna = null;// = AntennaArrayController.Instance.transform.GetChild(0);
-        cur_material = plane.GetComponent<MeshRenderer>().material;
-        
-        List<Vector4> antenna_pos = new List<Vector4>();
-
-        for (int i = 0; i < 100; i++)
-            antenna_pos.Add(Vector4.zero);
-        for (int i = 0; i < antenna.childCount; i++)
-            antenna_pos[i] = new Vector4(antenna.GetChild(i).position.x, antenna.GetChild(i).position.z, 0, 0);
-
-        cur_material.SetInt("_Antenna_count", antenna.childCount);
-        cur_material.SetVectorArray("_Antenna_position", antenna_pos);
-
-        cur_material.SetFloat("_Phase_shift", phase_shift);
-        cur_material.SetFloat("_Wave_length", wave_length);
-
-        cur_material.SetVector("_Sheet_position", new Vector4(plane.transform.position.x, plane.transform.position.z, 0, 0));
-        cur_material.SetFloat("_Sheet_size", 100);
-        #region Log
-        Debug.Log("_Antenna_count: " + antenna.childCount);
-        Debug.Log("_Phase_shift: " + phase_shift);
-        Debug.Log("_Wave_length: " + wave_length);
-        Debug.Log("_Sheet_position: " + new Vector4(plane.transform.position.x, plane.transform.position.z, 0, 0));
-        Debug.Log("_Sheet_size: " + 100);
-        #endregion
+            return plane_material;
+        }
     }
+    List<Transform> emitters = new List<Transform>();
+    
+    public void OnEmitterAdded(Transform emitter)
+    {
+        emitters.Add(emitter);
+        OnChange();
+    }
+    public void OnEmitterRemoved(Transform emitter)
+    {
+        emitters.Remove(emitter);
+    }
+    public void OnChange()
+    {
+        PlaneMaterial.SetInt("_antenna_count", emitters.Count);
+        PlaneMaterial.SetFloat("_sheet_size", 100f);
+
+        Vector4[] points = new Vector4[100];
+        float[] len = new float[100];
+        float[] per = new float[100];
+        float[] shift = new float[100];
+        for (int i = 0; i < emitters.Count; i++)
+        {
+            Emitter cur_emitter = emitters[i].GetComponent<Emitter>();
+            points[i] = new Vector4(emitters[i].position.x, emitters[i].position.z, 0, 0);
+            len[i] = cur_emitter.WaveLength;
+            per[i] = cur_emitter.WavePeriod;
+            shift[i] = cur_emitter.PhaseShift;
+        }
+
+        PlaneMaterial.SetVectorArray("_positions", points);
+
+        PlaneMaterial.SetFloatArray("_wave_length", len);
+        PlaneMaterial.SetFloatArray("_wave_period", per);
+        PlaneMaterial.SetFloatArray("_phase_shift", shift);
+
+        PlaneMaterial.SetColor("_max_amplitude_color", Color.red);
+        PlaneMaterial.SetColor("_min_amplitude_color", Color.black);
+    }
+
 }

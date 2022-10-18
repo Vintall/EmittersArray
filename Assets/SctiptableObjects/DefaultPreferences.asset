@@ -12,7 +12,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cbf6d50c8c32d44591fea15ddb2a810, type: 3}
   m_Name: DefaultPreferences
   m_EditorClassIdentifier: 
-  move_forward: 119
-  move_left: 97
-  move_back: 115
-  move_right: 100
+  input_sheets:
+  - sheet_name: Cam Movement
+    action_keys:
+    - name: Move Forward
+      key: 119
+    - name: Move Left
+      key: 97
+    - name: Move Right
+      key: 100
+    - name: Move Back
+      key: 115
+    - name: Move Up
+      key: 101
+    - name: Move Down
+      key: 113
+  - sheet_name: Create New Object On Map
+    action_keys:
+    - name: Create Emitter
+      key: 98
+    - name: Create Emitters Array
+      key: 110
+  - sheet_name: UI Adjustments
+    action_keys:
+    - name: Shift Crosshair Visibility
+      key: 105
+    - name: Close All Game UI Windows
+      key: 111
+    - name: Shift Monitoring UI Visibility
+      key: 112

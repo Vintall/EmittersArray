@@ -12,68 +12,29 @@ public class FreeCam : MonoBehaviour
     public float movementSpeed = 10f;
     public float fastMovementSpeed = 100f;
     public float freeLookSensitivity = 3f;
+    bool fast_mode = false;
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(1))
-            StartLooking();
-
-        if (Input.GetMouseButtonUp(1))
-            StopLooking();
-
-        if (!Input.GetMouseButton(1))
-            return;
-
-
-        var fastMode = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-        var movementSpeed = fastMode ? this.fastMovementSpeed : this.movementSpeed;
-
-        if (Input.GetKey(PreferencesController.Instance.MoveLeft))
-        {
-            transform.position += -transform.right * movementSpeed * Time.deltaTime;
-        }
-
-        if (Input.GetKey(PreferencesController.Instance.MoveRight))
-        {
-            transform.position += transform.right * movementSpeed * Time.deltaTime;
-        }
-
-        if (Input.GetKey(PreferencesController.Instance.MoveForward))
-        {
-            transform.position += transform.forward * movementSpeed * Time.deltaTime;
-        }
-
-        if (Input.GetKey(PreferencesController.Instance.MoveBack))
-        {
-            transform.position += -transform.forward * movementSpeed * Time.deltaTime;
-        }
-
-        if (Input.GetKey(KeyCode.Q))
-        {
-            transform.position += Vector3.up * movementSpeed * Time.deltaTime;
-        }
-
-        if (Input.GetKey(KeyCode.E))
-        {
-            transform.position += Vector3.down * movementSpeed * Time.deltaTime;
-        }
-
-        float newRotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * freeLookSensitivity;
-        float newRotationY = transform.localEulerAngles.x - Input.GetAxis("Mouse Y") * freeLookSensitivity;
-
-        
-        transform.localEulerAngles = new Vector3(newRotationY, newRotationX, 0f);
-    }
-
-    public void StartLooking()
+    public void OnMoveForward() => transform.position += (fast_mode ? fastMovementSpeed : movementSpeed) * transform.forward * Time.deltaTime;
+    public void OnMoveBack() => transform.position += (fast_mode ? fastMovementSpeed : movementSpeed) * -transform.forward * Time.deltaTime;
+    public void OnMoveLeft() => transform.position += (fast_mode ? fastMovementSpeed : movementSpeed) * -transform.right * Time.deltaTime;
+    public void OnMoveRight() => transform.position += (fast_mode ? fastMovementSpeed : movementSpeed) * transform.right * Time.deltaTime;
+    public void OnMoveUp() => transform.position += (fast_mode ? fastMovementSpeed : movementSpeed) * Vector3.up * Time.deltaTime;
+    public void OnMoveDown() => transform.position += (fast_mode ? fastMovementSpeed : movementSpeed) * Vector3.down * Time.deltaTime;
+    public void OnCheckBoost() => fast_mode = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+    public void OnStartLooking()
     {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
-
-    public void StopLooking()
+    public void OnStopLooking()
     {
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
+    }
+    public void OnLooking()
+    {
+        float newRotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * freeLookSensitivity;
+        float newRotationY = transform.localEulerAngles.x - Input.GetAxis("Mouse Y") * freeLookSensitivity;
+        transform.localEulerAngles = new Vector3(newRotationY, newRotationX, 0f);
     }
 }

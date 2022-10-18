@@ -17,30 +17,32 @@ public class EmittersPool : MonoBehaviour
     }
     #endregion
 
-    List<Transform> pool;
+    Queue<Transform> pool;
     private void Start()
     {
-        pool = new List<Transform>();
+        pool = new Queue<Transform>();
     }
-    public Transform TakeEmitter()
+    public static Transform TakeEmitter() => Instance.TakeEmitterInnerMethod();
+    public static void PlaceEmitter(Transform emitter) => Instance.PlaceEmitterInnerMethod(emitter);
+    private Transform TakeEmitterInnerMethod()
     {
         Transform obj;
         if (pool.Count == 0)
-        {
             obj = Instantiate(AssetHolder.Instance.EmitterPrefab).transform;
-            obj.gameObject.SetActive(true);
-            return obj;
-        }
+        else
+            obj = pool.Dequeue();
 
-        obj = pool[0];
-        pool.RemoveAt(0);
+        obj.parent = FreeEmittersHolder.Instance.transform;
         obj.gameObject.SetActive(true);
+        SimulationController.Instance.OnEmitterAdded(obj);
+
         return obj;
     }
-    public void PlaceEmitter(Transform emitter)
+    private void PlaceEmitterInnerMethod(Transform emitter)
     {
-        pool.Add(emitter);
+        pool.Enqueue(emitter);
         emitter.parent = transform;
         emitter.gameObject.SetActive(false);
+        SimulationController.Instance.OnEmitterRemoved(emitter);
     }
 }
