@@ -16,8 +16,32 @@ public class MainUIInputSheet : InputSheet
 
         if (Input.GetKeyDown(PreferencesController.Instance.ActionsKeys["Create Emitters Array"]))
             CreateObjectOnMap("Emitters Array");
-    }
 
+        if (Input.GetKeyDown(PreferencesController.Instance.ActionsKeys["Close All Game UI Windows"]))
+            CloseAllGameUIWindows();
+
+        if (Input.GetKeyDown(PreferencesController.Instance.ActionsKeys["Shift Crosshair Visibility"]))
+            ShiftCrosshairVisibility();
+
+        if (Input.GetMouseButtonDown(1))
+            RemoveUnpinnedGameUIWindows();
+
+        
+    }
+    void RemoveUnpinnedGameUIWindows()
+    {
+        for (int i = 0; i < UIController.Instance.ActiveGameUIWindows.transform.childCount; i++)
+            UIController.Instance.ActiveGameUIWindows.transform.GetChild(i).GetComponent<GameUIWindow>().DestroyIfUnpinned();
+    }
+    void CloseAllGameUIWindows()
+    {
+        for (int i = 0; i < UIController.Instance.ActiveGameUIWindows.transform.childCount; i++)
+            UIController.Instance.ActiveGameUIWindows.transform.GetChild(i).GetComponent<GameUIWindow>().OnCloseButtonPressed();
+    }
+    void ShiftCrosshairVisibility()
+    {
+        SettingsController.Instance.OverallSetter("Crosshair", (!bool.Parse(SettingsController.Instance.OverallGetter("Crosshair").Item2)).ToString());
+    }
     public override void OnActivate()
     {
         //throw new System.NotImplementedException();

@@ -11,7 +11,7 @@ public class EmittersArraysHolder : MonoBehaviour
     public static EmittersArraysHolder Instance => instance;
     private void Awake()
     {
-        if (instance = null)
+        if (instance == null)
             instance = this;
     }
 }

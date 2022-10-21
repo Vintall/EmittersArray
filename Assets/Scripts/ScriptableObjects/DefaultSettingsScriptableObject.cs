@@ -5,21 +5,55 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DefaultSettingsFile", menuName = "ScriptableObjects")]
 public class DefaultSettingsScriptableObject : ScriptableObject
 {
-    //Camera
-    public bool free_cam;
-    public bool crosshair;
-    
-    //Simulation
-    public float time_scale;
+    [System.Serializable]
+    public struct SettingPage
+    {
+        [SerializeField] string name;
+        [SerializeField] List<SettingNode> nodes;
+        public List<SettingNode> Nodes => nodes;
+        public string Name => name;
+    }
 
-    //Monitoring
-    public bool monitoring_emitters_count;
-    public bool monitoring_max_emitting;
-    public bool monitoring_min_emitting;
-    public bool monitoring_emitting_on_crosshair;
+    [System.Serializable]
+    public struct SettingNode
+    {
+        [SerializeField] string key;
+        [SerializeField] DataTypes type;
+        [SerializeField] string value;
 
-    //Field
-    public int field_width;
-    public int field_height;
+        public string Key => key;
+        public DataTypes Type => type;
+        public string Value => value;
+    }
 
+    public enum DataTypes
+    {
+        Int,
+        String,
+        Float,
+        Bool
+    }
+
+    [SerializeField] List<SettingPage> settings;
+    public List<SettingPage> SettingsList => settings;
+
+    Dictionary<string, (DataTypes, string)> dictionary_view = null;
+    public Dictionary<string, (DataTypes, string)> SettingsDictionary
+    {
+        get
+        {
+            if (dictionary_view != null)
+                return dictionary_view; // This data can not be changed. So, we can initialize it only once.
+
+            Dictionary<string, (DataTypes, string)> result = new Dictionary<string, (DataTypes, string)>();
+
+            foreach(SettingPage page in settings)
+                foreach(SettingNode node in page.Nodes)
+                    result.Add(node.Key, (node.Type, node.Value));
+
+            dictionary_view = result;
+
+            return result;
+        }
+    }
 }

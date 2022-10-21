@@ -8,6 +8,21 @@ public class Emitter : MonoBehaviour, IUIInteractable
     float phase_shift;
     float wave_period;
 
+    SphereCollider emitter_collider = null;
+
+    public void ActivateCollider()
+    {
+        emitter_collider.enabled = true;
+    }
+    public void DeactivateCollider()
+    {
+        emitter_collider.enabled = false;
+    }
+    public void CloseGameUIWindow()
+    {
+        if (game_ui_window != null)
+            game_ui_window.OnCloseButtonPressed();
+    }
     public float WaveLength
     {
         get => wave_length;
@@ -58,7 +73,9 @@ public class Emitter : MonoBehaviour, IUIInteractable
     float WavePeriodUIWindowGetter() => WavePeriod;
     void WavePeriodUIWindowSetter(float value) => WavePeriod = value;
 
-    private void Start()
+    private void Awake()
     {
+        if (emitter_collider == null)
+            emitter_collider = GetComponent<SphereCollider>();
     }
 }

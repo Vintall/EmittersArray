@@ -7,10 +7,6 @@ public class SettingsController : MonoBehaviour
 {
     [SerializeField] DefaultSettingsScriptableObject default_settings;
     public DefaultSettingsScriptableObject DefaultSettings => default_settings;
-
-    const string DefaultFolderName = "JsonFiles";
-    const string DefaultFileName = "SettingsControllerSave";
-
     static SettingsController instance;
     public static SettingsController Instance => instance;
     private void Awake()
@@ -18,13 +14,43 @@ public class SettingsController : MonoBehaviour
         if (instance == null)
             instance = this;
     }
-    private void OnApplicationQuit()
-    {
-        SaveSettingsToFile();
+    const string DefaultFolderName = "JsonFiles";
+    const string DefaultFileName = "SettingsControllerSave";
+    string SaveFileDirectory => Path.Combine(Application.dataPath, DefaultFolderName);
+    string SaveFilePath => Path.Combine(SaveFileDirectory, DefaultFileName);
+
+    public delegate void OnSetSettingValueDelegat(string key);
+    event OnSetSettingValueDelegat OnSetSettingValue; // setter handlers. in handler we supposed to check for current key (- - - if(key != "our key") return; - - -)
+    public void RegisterSetterEventHandler(OnSetSettingValueDelegat handler) => OnSetSettingValue += handler;
+    public void UnRegisterSetterEventHandler(OnSetSettingValueDelegat handler) => OnSetSettingValue -= handler;
+
+    Dictionary<string, (DefaultSettingsScriptableObject.DataTypes, string)> settings = null; // settings storage
+    public (DefaultSettingsScriptableObject.DataTypes, string) OverallGetter(string key)
+    { // Getter for every node in dictionary. 
+        if (!settings.ContainsKey(key))
+            throw new System.Exception("Key: \"" + key + "\" not exist!");
+
+        return settings[key];
     }
-    private void Start()
+    public void OverallSetter(string key, string value)
+    { // Setter for every node in dictionary. Notiry every interesting side about all changes.
+        if (!settings.ContainsKey(key))
+            throw new System.Exception("Key: \"" + key + "\" not exist!");
+
+        settings[key] = (settings[key].Item1, value);
+        OnSetSettingValue(key);
+    }
+    public void AddSettingNode(string key, DefaultSettingsScriptableObject.DataTypes type, string value)
     {
-        LoadSettingsFromFile();
+        if (settings == null)
+            settings = new Dictionary<string, (DefaultSettingsScriptableObject.DataTypes, string)>();
+
+        settings.Add(key, (type, value));
+        OnSetSettingValue(key);
+    }
+    void Testsdf(string key)//--------------------------
+    {
+        Debug.Log("Setting :\"" + key +"\"");
     }
     public void LoadSettingsFromFile()
     {
@@ -35,27 +61,33 @@ public class SettingsController : MonoBehaviour
             Debug.Log("Failed to load. Applying default.");
             return;
         }
-
         string json = File.ReadAllText(SaveFilePath);
         SettingsControllerJSONFormat json_obj = JsonUtility.FromJson<SettingsControllerJSONFormat>(json);
 
-        FreeCam = json_obj.free_cam;
-        Crosshair = json_obj.crosshair;
+        if (settings != null)
+            settings.Clear();
 
-        TimeScale = json_obj.time_scale;
+        try
+        {
+            foreach (string node in json_obj.settings.Keys)
+                AddSettingNode(node, json_obj.settings[node].Item1, json_obj.settings[node].Item2);
+        }
+        catch
+        {
+            LoadDefaultSettings();
+        }
+    }
+    public void LoadDefaultSettings()
+    {
+        if (settings != null)
+            settings.Clear();
 
-        MonitoringEmittersCount = json_obj.monitoring_emitters_count;
-        MonitoringMinEmitting = json_obj.monitoring_min_emitting;
-        MonitoringMaxEmitting = json_obj.monitoring_max_emitting;
-        MonitoringEmittingOnCrosshair = json_obj.monitoring_emitting_on_crosshair;
-
-        FieldWidth = json_obj.field_width;
-        FieldHeight = json_obj.field_height;
-
+        foreach (string node in DefaultSettings.SettingsDictionary.Keys)
+            AddSettingNode(node, DefaultSettings.SettingsDictionary[node].Item1, DefaultSettings.SettingsDictionary[node].Item2);
     }
     public void SaveSettingsToFile()
     {
-        SettingsControllerJSONFormat json_format = new SettingsControllerJSONFormat(Instance);
+        SettingsControllerJSONFormat json_format = new SettingsControllerJSONFormat(settings);
         string json = JsonUtility.ToJson(json_format);
 
         if (!Directory.Exists(SaveFileDirectory))
@@ -67,182 +99,39 @@ public class SettingsController : MonoBehaviour
 
         Debug.Log("Save Settings To JSON");
     }
-
-    string SaveFilePath => Path.Combine(SaveFileDirectory, DefaultFileName);
-    string SaveFileDirectory => Path.Combine(Application.dataPath, DefaultFolderName);
-    public void LoadDefaultSettings()
+    private void OnApplicationQuit()
     {
-        FreeCam = DefaultSettings.free_cam;
-        Crosshair = DefaultSettings.crosshair;
-
-        TimeScale = DefaultSettings.time_scale;
-
-        MonitoringEmittersCount = DefaultSettings.monitoring_emitters_count;
-        MonitoringMinEmitting = DefaultSettings.monitoring_min_emitting;
-        MonitoringMaxEmitting = DefaultSettings.monitoring_max_emitting;
-        MonitoringEmittingOnCrosshair = DefaultSettings.monitoring_emitting_on_crosshair;
-
-        FieldWidth = DefaultSettings.field_width;
-        FieldHeight = DefaultSettings.field_height;
-
+        SaveSettingsToFile();
+    }
+    private void Start()
+    {
+        RegisterSetterEventHandler(Testsdf);
+        LoadSettingsFromFile();
     }
 
-    #region Variables
-
-    #region FreeCam
-    [SerializeField, SerializeProperty("FreeCam")]
-    bool free_cam;
-    public bool FreeCam
-    {
-        get => free_cam;
-        set
-        {
-            bool prev = free_cam;
-            free_cam = value;
-            Debug.Log("FreeCam: " + prev + " ==> " + free_cam);
-        }
-    }
-    #endregion
-    #region Crosshair
-    [SerializeField, SerializeProperty("Crosshair")]
-    bool crosshair;
-    public bool Crosshair
-    {
-        get => crosshair;
-        set
-        {
-            bool prev = crosshair;
-            crosshair = value;
-            Debug.Log("Crosshair: " + prev + " ==> " + crosshair);
-        }
-    }
-    #endregion
-
-    #region TimeScale
-    [SerializeField, SerializeProperty("TimeScale")]
-    float time_scale;
-    public float TimeScale
-    {
-        get => time_scale;
-        set
-        {
-            float prev = time_scale;
-            time_scale = value;
-            Debug.Log("TimeScale: " + prev + " ==> " + time_scale);
-        }
-    }
-    #endregion
-
-    #region MonitoringEmittersCount
-    [SerializeField, SerializeProperty("MonitoringEmittersCount")]
-    bool monitoring_emitters_count;
-    public bool MonitoringEmittersCount
-    {
-        get => monitoring_emitters_count;
-        set
-        {
-            bool prev = monitoring_emitters_count;
-            monitoring_emitters_count = value;
-            Debug.Log("MonitoringEmittersCount");
-        }
-    }
-    #endregion
-    #region MonitoringMinEmitting
-    [SerializeField, SerializeProperty("MonitoringMinEmitting")]
-    bool monitoring_min_emitting;
-    public bool MonitoringMinEmitting
-    {
-        get => monitoring_min_emitting;
-        set
-        {
-            bool prev = monitoring_min_emitting;
-            monitoring_min_emitting = value;
-            Debug.Log("MonitoringMinEmitting: " + prev + " ==> " + monitoring_min_emitting);
-        }
-    }
-    #endregion
-    #region MonitoringMaxEmitting
-    [SerializeField, SerializeProperty("MonitoringMaxEmitting")]
-    bool monitoring_max_emitting;
-    public bool MonitoringMaxEmitting
-    {
-        get => monitoring_max_emitting;
-        set
-        {
-            bool prev = MonitoringMaxEmitting;
-            monitoring_max_emitting = value;
-            Debug.Log("MonitoringMaxEmitting: " + prev + " ==> " + monitoring_max_emitting);
-        }
-    }
-    #endregion
-    #region MonitoringEmittingOnCrosshair
-    [SerializeField, SerializeProperty("MonitoringEmittingOnCrosshair")]
-    bool monitoring_emitting_on_crosshair;
-    public bool MonitoringEmittingOnCrosshair
-    {
-        get => monitoring_emitting_on_crosshair;
-        set
-        {
-            bool prev = monitoring_emitting_on_crosshair;
-            monitoring_emitting_on_crosshair = value;
-            Debug.Log("MonitoringEmittingOnCrosshair: " + prev + " ==> " + monitoring_emitting_on_crosshair);
-        }
-    }
-    #endregion
-
-    #region FieldWidth
-    [SerializeField, SerializeProperty("FieldWidth")]
-    int field_width;
-    public int FieldWidth
-    {
-        get => field_width;
-        set
-        {
-            int prev = field_width;
-            field_width = value;
-            Debug.Log("FieldWidth: " + prev + " ==> " + field_width);
-        }
-    }
-    #endregion
-    #region FieldHeight
-    [SerializeField, SerializeProperty("FieldHeight")]
-    int field_height;
-    public int FieldHeight
-    {
-        get => field_height;
-        set
-        {
-            int prev = field_height;
-            field_height = value;
-            Debug.Log("FieldHeight: " + prev + " ==> " + field_height);
-        }
-    }
-    #endregion
-
-    #endregion
+    
 
     #region ResetToDefault
 
     public void ResetCameraMenu()
     {
-        FreeCam = default_settings.free_cam;
-        Crosshair = default_settings.crosshair;
+        OverallSetter("Crosshair", DefaultSettings.SettingsDictionary["Crosshair"].Item2); 
     }
     public void ResetSimulationMenu()
     {
-        TimeScale = default_settings.time_scale;
+        settings["Time Scale"] = DefaultSettings.SettingsDictionary["Time Scale"];
     }
     public void ResetMonitoringPage()
     {
-        MonitoringEmittersCount = DefaultSettings.monitoring_emitters_count;
-        MonitoringEmittingOnCrosshair = DefaultSettings.monitoring_emitting_on_crosshair;
-        MonitoringMaxEmitting = DefaultSettings.monitoring_max_emitting;
-        MonitoringMinEmitting = DefaultSettings.monitoring_min_emitting;
+        OverallSetter("Monitoring Emitters Count", DefaultSettings.SettingsDictionary["Monitoring Emitters Count"].Item2);
+        OverallSetter("Monitoring Emitting On Crosshair", DefaultSettings.SettingsDictionary["Monitoring Emitting On Crosshair"].Item2);
+        OverallSetter("Monitoring Max Emitting", DefaultSettings.SettingsDictionary["Monitoring Max Emitting"].Item2);
+        OverallSetter("Monitoring Min Emitting", DefaultSettings.SettingsDictionary["Monitoring Min Emitting"].Item2);
     }
     public void ResetFieldPage()
     {
-        FieldWidth = DefaultSettings.field_width;
-        FieldHeight = DefaultSettings.field_height;
+        OverallSetter("Field Width", DefaultSettings.SettingsDictionary["Field Width"].Item2);
+        OverallSetter("Field Height", DefaultSettings.SettingsDictionary["Field Height"].Item2);
     }
     #endregion
 }

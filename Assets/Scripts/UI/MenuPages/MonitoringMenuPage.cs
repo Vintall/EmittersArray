@@ -11,7 +11,6 @@ public class MonitoringMenuPage : MonoBehaviour, IMenuPage
         get => emitters_count.isOn;
         set => emitters_count.isOn = value;
     }    
-    bool emitters_count_was_changed = false;
     #endregion
     #region MaxEmitting
     [SerializeField] UnityEngine.UI.Toggle max_emitting;
@@ -20,7 +19,6 @@ public class MonitoringMenuPage : MonoBehaviour, IMenuPage
         get => max_emitting.isOn;
         set => max_emitting.isOn = value;
     }
-    bool max_emitting_was_changed = false;
     #endregion
     #region MinEmitting
     [SerializeField] UnityEngine.UI.Toggle min_emitting;
@@ -29,7 +27,6 @@ public class MonitoringMenuPage : MonoBehaviour, IMenuPage
         get => min_emitting.isOn;
         set => min_emitting.isOn = value;
     }
-    bool min_emitting_was_changed = false;
     #endregion
     #region EmittingOnCrosshair
     [SerializeField] UnityEngine.UI.Toggle emitting_on_crosshair;
@@ -38,43 +35,19 @@ public class MonitoringMenuPage : MonoBehaviour, IMenuPage
         get => emitting_on_crosshair.isOn;
         set => emitting_on_crosshair.isOn = value;
     }
-    bool emitting_on_crosshair_was_changed = false;
     #endregion
 
     #region UIInteractions
-    public void EmittersCountTogglePressed() => emitters_count_was_changed = true;
-    public void MaxEmittingTogglePressed() => max_emitting_was_changed = true;
-    public void MinEmittingTogglePressed() => min_emitting_was_changed = true;
-    public void EmittingOnCrosshairTogglePressed() => emitting_on_crosshair_was_changed = true;
     public void ConfirmChangesButtonPressed() => ConfirmChanges();
     public void ResetToDefaultButtonPressed() => ResetToDefault();
     #endregion;
 
     void ConfirmChanges()
     {
-        if (emitters_count_was_changed)
-        {
-            SettingsController.Instance.MonitoringEmittersCount = EmittersCount;
-            emitters_count_was_changed = false;
-        }
-
-        if (max_emitting_was_changed)
-        {
-            SettingsController.Instance.MonitoringMaxEmitting = MaxEmitting;
-            max_emitting_was_changed = false;
-        }
-
-        if (min_emitting_was_changed)
-        {
-            SettingsController.Instance.MonitoringMinEmitting = MinEmitting;
-            min_emitting_was_changed = false;
-        }
-
-        if (emitting_on_crosshair_was_changed)
-        {
-            SettingsController.Instance.MonitoringEmittingOnCrosshair = EmittingOnCrosshair;
-            emitting_on_crosshair_was_changed = false;
-        }
+        SettingsController.Instance.OverallSetter("Monitoring Emitters Count", EmittersCount.ToString());
+        SettingsController.Instance.OverallSetter("Monitoring Max Emitting", MaxEmitting.ToString());
+        SettingsController.Instance.OverallSetter("Monitoring Min Emitting", MinEmitting.ToString());
+        SettingsController.Instance.OverallSetter("Monitoring Emitting On Crosshair", EmittingOnCrosshair.ToString());
     }
     void ResetToDefault()
     {
@@ -96,14 +69,9 @@ public class MonitoringMenuPage : MonoBehaviour, IMenuPage
 
     public void LoadOnActivation()
     {
-        emitters_count_was_changed = false;
-        max_emitting_was_changed = false;
-        min_emitting_was_changed = false;
-        emitting_on_crosshair_was_changed = false;
-
-        EmittersCount = SettingsController.Instance.MonitoringEmittersCount;
-        EmittingOnCrosshair = SettingsController.Instance.MonitoringEmittingOnCrosshair;
-        MinEmitting = SettingsController.Instance.MonitoringMinEmitting;
-        MaxEmitting = SettingsController.Instance.MonitoringMaxEmitting;
+        EmittersCount = bool.Parse(SettingsController.Instance.OverallGetter("Monitoring Emitters Count").Item2);
+        EmittingOnCrosshair = bool.Parse(SettingsController.Instance.OverallGetter("Monitoring Emitting On Crosshair").Item2);
+        MinEmitting = bool.Parse(SettingsController.Instance.OverallGetter("Monitoring Min Emitting").Item2);
+        MaxEmitting = bool.Parse(SettingsController.Instance.OverallGetter("Monitoring Max Emitting").Item2);
     }
 }

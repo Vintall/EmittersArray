@@ -7,31 +7,11 @@ using UnityEngine;
 /// </summary>
 public class SettingsControllerJSONFormat
 {
-    public bool free_cam;
-    public bool crosshair;
+    public Dictionary<string, (DefaultSettingsScriptableObject.DataTypes, string)> settings;
 
-    public float time_scale;
-
-    public bool monitoring_emitters_count;
-    public bool monitoring_min_emitting;
-    public bool monitoring_max_emitting;
-    public bool monitoring_emitting_on_crosshair;
-
-    public int field_width;
-    public int field_height;
-
-
-    public SettingsControllerJSONFormat(SettingsController obj)
+    public SettingsControllerJSONFormat(Dictionary<string, (DefaultSettingsScriptableObject.DataTypes, string)> current_settings)
     {
-        free_cam = obj.FreeCam;
-        crosshair = obj.Crosshair;
-        time_scale = obj.TimeScale;
-        monitoring_emitters_count = obj.MonitoringEmittersCount;
-        monitoring_min_emitting = obj.MonitoringMinEmitting;
-        monitoring_max_emitting = obj.MonitoringMaxEmitting;
-        monitoring_emitting_on_crosshair = obj.MonitoringEmittingOnCrosshair;
-        field_width = obj.FieldWidth;
-        field_height = obj.FieldHeight;
+        settings = new Dictionary<string, (DefaultSettingsScriptableObject.DataTypes, string)>(current_settings);
     }
 
 }

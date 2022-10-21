@@ -55,7 +55,8 @@ public class InterferencePlaneInteractionController : MonoBehaviour
                 obj = EmittersPool.TakeEmitter();
                 break;
             case "Emitters Array":
-
+                obj = Instantiate(AssetHolder.Instance.EmittersArray).transform;
+                obj.parent = EmittersArraysHolder.Instance.transform;
                 break;
         }
 

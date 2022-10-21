@@ -17,10 +17,10 @@ public class EmittersPool : MonoBehaviour
     }
     #endregion
 
-    Queue<Transform> pool;
+    Queue<Transform> pool = new Queue<Transform>();
     private void Start()
     {
-        pool = new Queue<Transform>();
+        
     }
     public static Transform TakeEmitter() => Instance.TakeEmitterInnerMethod();
     public static void PlaceEmitter(Transform emitter) => Instance.PlaceEmitterInnerMethod(emitter);
@@ -41,6 +41,8 @@ public class EmittersPool : MonoBehaviour
     private void PlaceEmitterInnerMethod(Transform emitter)
     {
         pool.Enqueue(emitter);
+
+        emitter.GetComponent<Emitter>().CloseGameUIWindow();
         emitter.parent = transform;
         emitter.gameObject.SetActive(false);
         SimulationController.Instance.OnEmitterRemoved(emitter);

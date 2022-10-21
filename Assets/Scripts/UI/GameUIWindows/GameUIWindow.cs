@@ -27,6 +27,7 @@ public class GameUIWindow : MonoBehaviour
 
     #region WindowBarButtons
     bool is_window_minimized = false;
+    bool is_window_pinned = false;
     public void OnMinimizeButtonPressed()
     {
         if (is_window_minimized)
@@ -35,9 +36,14 @@ public class GameUIWindow : MonoBehaviour
 
         is_window_minimized = !is_window_minimized;
     }
+    public void DestroyIfUnpinned()
+    {
+        if (!is_window_pinned)
+            OnCloseButtonPressed();
+    }
     public void OnPinButtonPressed()
     {
-        Debug.Log("Pin");
+        is_window_pinned = !is_window_pinned;
     }
     public void OnCloseButtonPressed()
     {

@@ -24,9 +24,9 @@ MonoBehaviour:
     - name: Move Back
       key: 115
     - name: Move Up
-      key: 101
+      key: 32
     - name: Move Down
-      key: 113
+      key: 306
   - sheet_name: Create New Object On Map
     action_keys:
     - name: Create Emitter
@@ -41,3 +41,9 @@ MonoBehaviour:
       key: 111
     - name: Shift Monitoring UI Visibility
       key: 112
+  - sheet_name: Objects Interactions
+    action_keys:
+    - name: Clockwise Rotation
+      key: 101
+    - name: Counterclockwise Rotation
+      key: 113

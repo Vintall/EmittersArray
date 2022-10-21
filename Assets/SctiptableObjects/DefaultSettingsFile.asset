@@ -12,15 +12,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15439a955c71af64ca3fc295feabadd4, type: 3}
   m_Name: DefaultSettingsFile
   m_EditorClassIdentifier: 
-  free_cam: 1
-  crosshair: 1
-  time_scale: 1
-  emitters_count: 1
-  max_emitting: 0
-  min_emitting: 0
-  emitting_on_crosshair: 1
-  field_width: 2000
-  field_height: 2000
-  antennas_count: 80
-  wave_length: 1
-  distance_between_emitters: 0.1
+  settings:
+  - name: Field
+    nodes:
+    - key: Field Width
+      type: 0
+      value: 100
+    - key: Field Height
+      type: 0
+      value: 100
+  - name: Monitoring
+    nodes:
+    - key: Monitoring Emitters Count
+      type: 3
+      value: False
+    - key: Monitoring Max Emitting
+      type: 3
+      value: False
+    - key: Monitoring Min Emitting
+      type: 3
+      value: False
+    - key: Monitoring Emitting On Crosshair
+      type: 3
+      value: False
+  - name: Else
+    nodes:
+    - key: Time Scale
+      type: 2
+      value: 1
+    - key: Crosshair
+      type: 3
+      value: True

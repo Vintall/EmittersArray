@@ -11,6 +11,10 @@ public class SimulationController : MonoBehaviour
         if (instance == null)
             instance = this;
     }
+    public void Start()
+    {
+        SettingsController.Instance.RegisterSetterEventHandler(OnTimeScaleChanged);
+    }
 
     [SerializeField] InterferencePlane plane;
     [SerializeField] Material plane_material = null;
@@ -26,6 +30,13 @@ public class SimulationController : MonoBehaviour
     }
     List<Transform> emitters = new List<Transform>();
     
+    void OnTimeScaleChanged(string key)
+    {
+        if (key != "Time Scale")
+            return;
+
+        Time.timeScale = float.Parse(SettingsController.Instance.OverallGetter("Time Scale").Item2);
+    }
     public void OnEmitterAdded(Transform emitter)
     {
         emitters.Add(emitter);
@@ -44,7 +55,8 @@ public class SimulationController : MonoBehaviour
         float[] len = new float[100];
         float[] per = new float[100];
         float[] shift = new float[100];
-        for (int i = 0; i < emitters.Count; i++)
+
+        for (int i = 0; i < emitters.Count && i < 100; i++)
         {
             Emitter cur_emitter = emitters[i].GetComponent<Emitter>();
             points[i] = new Vector4(emitters[i].position.x, emitters[i].position.z, 0, 0);

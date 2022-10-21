@@ -19,6 +19,11 @@ public class ChoosingObjectsInputSheet : InputSheet
         if (Input.GetKeyDown(KeyCode.Delete))
             DeleteObject();
 
+        if (Input.GetKey(PreferencesController.Instance.ActionsKeys["Clockwise Rotation"]))
+            RightRotation();
+
+        if (Input.GetKey(PreferencesController.Instance.ActionsKeys["Counterclockwise Rotation"]))
+            LeftRotation();
     }
     const float mouse_click_room = 5;
 
@@ -81,9 +86,8 @@ public class ChoosingObjectsInputSheet : InputSheet
                     return;
                 case "EmittersArray":
                     if_hit_object = true;
-                    current_obj = hit.transform;
+                    current_obj = hit.transform.parent; // Cylinder with collider - child object in emitters array.
                     obj_type = hit.transform.tag;
-
                     return;
                 default:
                     break;
@@ -125,8 +129,6 @@ public class ChoosingObjectsInputSheet : InputSheet
     }
     private void OnMouseDragEvent()
     {
-        Debug.Log(interference_plane_hit.point.x +"        "+interference_plane_hit.point.z);
-
         if (if_hit_interference_plane && if_hit_object)
         {
             current_obj.position = new Vector3(interference_plane_hit.point.x, 0, interference_plane_hit.point.z);
@@ -145,13 +147,33 @@ public class ChoosingObjectsInputSheet : InputSheet
         if (obj_type == "Emitter")
         {
             EmittersPool.PlaceEmitter(current_obj);
-            if_hit_object = false;
-            current_obj = null;
-            obj_type = "";
-
-            SimulationController.Instance.OnChange();
         }
-        
+        if (obj_type == "EmittersArray")
+        {
+            current_obj.GetComponent<EmittersArray>().RemoveEmittersArray();
+            Destroy(current_obj.gameObject);
+        }
+
+        if_hit_object = false;
+        current_obj = null;
+        obj_type = "";
+        SimulationController.Instance.OnChange();
+    }
+
+    const float rotation_speed = 90f;
+    void RightRotation()
+    {
+        if (current_obj == null)
+            return;
+
+        current_obj.Rotate(new Vector3(0, rotation_speed, 0) * Time.deltaTime);
+    }
+    void LeftRotation()
+    {
+        if (current_obj == null)
+            return;
+
+        current_obj.Rotate(new Vector3(0, -rotation_speed, 0) * Time.deltaTime);
     }
     
     Vector2 mouse_pos = Vector2.zero;
