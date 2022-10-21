@@ -14,6 +14,7 @@ public class EmittersArray : MonoBehaviour, IUIInteractable
             emitter.ActivateCollider();
             EmittersPool.PlaceEmitter(emitter.transform);
         }
+        emitters.Clear();
         cylinder.localScale = new Vector3(1, 1, 1);
 
         for (int i = 0; i < emitters_count; i++) // Placing new emitters
@@ -36,6 +37,7 @@ public class EmittersArray : MonoBehaviour, IUIInteractable
                 0);
         }
         cylinder.localScale = new Vector3(0.7f, Mathf.Max(emitters_count * distance_between_emitters / 2, 1), 0.7f);
+        SimulationController.Instance.OnChange();
     }
     public void RemoveEmittersArray()
     {

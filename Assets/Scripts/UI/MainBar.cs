@@ -12,17 +12,13 @@ public class MainBar : MonoBehaviour
         cur_menu_holder_instance.CloseAll();
         UIController.Instance.OpenMainUI();
     }
-    public void ResetMenuPressed()
+    public void InfoPressed()
     {
-        cur_menu_holder_instance.OpenResetAllPage();
+        cur_menu_holder_instance.OpenInfoPage();
     }
     public void FieldPressed()
     {
         cur_menu_holder_instance.OpenFieldPage();
-    }
-    public void MonitoringPressed()
-    {
-        cur_menu_holder_instance.OpenMonitoringPage();
     }
     public void SimulationPressed()
     {

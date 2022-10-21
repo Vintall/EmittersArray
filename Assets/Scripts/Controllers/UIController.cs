@@ -8,6 +8,7 @@ public class UIController : MonoBehaviour
     [SerializeField] GameObject main_ui_gameObject;
     [SerializeField] GameObject active_game_ui_windows;
     [SerializeField] GameObject crosshair;
+    [SerializeField] CurMenuHolder cur_menu_holder;
 
     public GameObject MenuUIGameObject => menu_ui_gameObject;
     public GameObject MainUIGameObject => main_ui_gameObject;
@@ -43,6 +44,7 @@ public class UIController : MonoBehaviour
     {
         menu_ui_gameObject.SetActive(true);
         main_ui_gameObject.SetActive(false);
+        cur_menu_holder.OpenInfoPage();
 
         InputController.Instance.GoToActionPattern("Menu UI");
     }

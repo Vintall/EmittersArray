@@ -14,7 +14,7 @@ Shader "Custom/InterferenceShader"
         #pragma surface surf Standard //fullforwardshadows
         #pragma target 3.0
 
-#define max_antennas_count 100
+#define max_antennas_count 980 // wtf. can not increase this number
 #define PI 3.1415926
 
         float2 _MainTex;
@@ -25,7 +25,7 @@ Shader "Custom/InterferenceShader"
         };
 
         float2 _sheet_position;
-        float _sheet_size;
+        float2 _sheet_size;
 
         int _antenna_count;
 
@@ -37,11 +37,10 @@ Shader "Custom/InterferenceShader"
         half3 _max_amplitude_color;
         half3 _min_amplitude_color;
         
-        UNITY_INSTANCING_BUFFER_START(Props)
-        UNITY_INSTANCING_BUFFER_END(Props)
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
+
             float result = 0;
 
             float2 uv = -(IN.uv_MainTex - 0.5) * _sheet_size + _sheet_position; // pixel world position

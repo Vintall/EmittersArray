@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class InterferencePlane : MonoBehaviour
 {
-    private void Start()
+    static InterferencePlane instance;
+    public static InterferencePlane Instance => instance;
+    private void Awake()
     {
-        
+        if (instance == null)
+            instance = this;
     }
 }

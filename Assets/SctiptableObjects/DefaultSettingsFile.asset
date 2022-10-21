@@ -21,20 +21,6 @@ MonoBehaviour:
     - key: Field Height
       type: 0
       value: 100
-  - name: Monitoring
-    nodes:
-    - key: Monitoring Emitters Count
-      type: 3
-      value: False
-    - key: Monitoring Max Emitting
-      type: 3
-      value: False
-    - key: Monitoring Min Emitting
-      type: 3
-      value: False
-    - key: Monitoring Emitting On Crosshair
-      type: 3
-      value: False
   - name: Else
     nodes:
     - key: Time Scale

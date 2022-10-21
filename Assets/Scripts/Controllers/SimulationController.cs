@@ -14,6 +14,32 @@ public class SimulationController : MonoBehaviour
     public void Start()
     {
         SettingsController.Instance.RegisterSetterEventHandler(OnTimeScaleChanged);
+        SettingsController.Instance.RegisterSetterEventHandler(OnInterferencePlaneWidthChanged);
+        SettingsController.Instance.RegisterSetterEventHandler(OnInterferencePlaneHeightChanged);
+    }
+    void OnInterferencePlaneWidthChanged(string key)
+    {
+        if (key != "Field Width")
+            return;
+
+        float width = float.Parse(SettingsController.Instance.OverallGetter("Field Width").Item2);
+        float height = float.Parse(SettingsController.Instance.OverallGetter("Field Height").Item2);
+
+        InterferencePlane.Instance.transform.localScale = new Vector3(width / 10, height / 10); // x/10, cause of basic size of plane. scale(1,1,1) => size(10, .., 10) 
+
+        OnChange();
+    }
+    void OnInterferencePlaneHeightChanged(string key)
+    {
+        if (key != "Field Height")
+            return;
+
+        float width = float.Parse(SettingsController.Instance.OverallGetter("Field Width").Item2);
+        float height = float.Parse(SettingsController.Instance.OverallGetter("Field Height").Item2);
+
+        InterferencePlane.Instance.transform.localScale = new Vector3(width / 10, 1, height / 10); // x/10, cause of basic size of plane. scale(1,1,1) => size(10, .., 10) 
+
+        OnChange();
     }
 
     [SerializeField] InterferencePlane plane;
@@ -35,7 +61,7 @@ public class SimulationController : MonoBehaviour
         if (key != "Time Scale")
             return;
 
-        Time.timeScale = float.Parse(SettingsController.Instance.OverallGetter("Time Scale").Item2);
+        OnChange();
     }
     public void OnEmitterAdded(Transform emitter)
     {
@@ -47,16 +73,20 @@ public class SimulationController : MonoBehaviour
         emitters.Remove(emitter);
     }
     public void OnChange()
-    {
+    {// Full shader data reset
         PlaneMaterial.SetInt("_antenna_count", emitters.Count);
-        PlaneMaterial.SetFloat("_sheet_size", 100f);
+        PlaneMaterial.SetVector("_sheet_size", new Vector4(float.Parse(SettingsController.Instance.OverallGetter("Field Width").Item2),
+            float.Parse(SettingsController.Instance.OverallGetter("Field Height").Item2), 0, 0));
 
-        Vector4[] points = new Vector4[100];
-        float[] len = new float[100];
-        float[] per = new float[100];
-        float[] shift = new float[100];
+        const int emitters_max_size = 1000;
 
-        for (int i = 0; i < emitters.Count && i < 100; i++)
+        //We need to pass max sized massive to shader.
+        Vector4[] points = new Vector4[emitters_max_size];
+        float[] len = new float[emitters_max_size];
+        float[] per = new float[emitters_max_size];
+        float[] shift = new float[emitters_max_size];
+
+        for (int i = 0; i < emitters.Count && i < emitters_max_size; i++)
         {
             Emitter cur_emitter = emitters[i].GetComponent<Emitter>();
             points[i] = new Vector4(emitters[i].position.x, emitters[i].position.z, 0, 0);

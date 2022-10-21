@@ -39,8 +39,6 @@ MonoBehaviour:
       key: 105
     - name: Close All Game UI Windows
       key: 111
-    - name: Shift Monitoring UI Visibility
-      key: 112
   - sheet_name: Objects Interactions
     action_keys:
     - name: Clockwise Rotation

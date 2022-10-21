@@ -31,9 +31,14 @@ public class GameUIWindowFloatField : GameUIWindowField
     }
     public void OnInputFieldValueEndEdit()
     {
-        if (setter != null)
-            setter.Invoke(float.Parse(input_field.text));
-        else
+        if (setter == null)
+        {
             Debug.LogError("Delegate is null");
+            return;
+        }
+
+        string result = input_field.text.Replace('.', ',');
+        setter.Invoke(float.Parse(result));
+            
     }
 }

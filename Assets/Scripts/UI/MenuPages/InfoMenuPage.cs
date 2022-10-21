@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ResetAllMenuPage : MonoBehaviour, IMenuPage
+public class InfoMenuPage : MonoBehaviour, IMenuPage
 {
     public void ActivateGameObject()
     {
@@ -17,6 +17,5 @@ public class ResetAllMenuPage : MonoBehaviour, IMenuPage
 
     public void LoadOnActivation()
     {
-
     }
 }

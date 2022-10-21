@@ -10,9 +10,8 @@ public class CurMenuHolder : MonoBehaviour
     {
         menu_pages = new List<IMenuPage>()
         {
-            reset_all_page,
+            info_page,
             field_page,
-            monitoring_page,
             simulation_page,
             camera_page,
             preferences_page
@@ -27,14 +26,13 @@ public class CurMenuHolder : MonoBehaviour
             page.DeactivateGameObject();
 
     }
-
-    #region ResetAllPage
-    [SerializeField] ResetAllMenuPage reset_all_page;
-    public ResetAllMenuPage ResetAllPage => reset_all_page;
-    public void OpenResetAllPage()
+    #region InfoPage
+    [SerializeField] InfoMenuPage info_page;
+    public InfoMenuPage InfoPage => info_page;
+    public void OpenInfoPage()
     {
         CloseAll();
-        reset_all_page.ActivateGameObject();
+        info_page.ActivateGameObject();
     }
     #endregion
 
@@ -45,16 +43,6 @@ public class CurMenuHolder : MonoBehaviour
     {
         CloseAll();
         field_page.ActivateGameObject();
-    }
-    #endregion
-
-    #region MonitoringPage
-    [SerializeField] MonitoringMenuPage monitoring_page;
-    public MonitoringMenuPage MonitoringPage => monitoring_page;
-    public void OpenMonitoringPage()
-    {
-        CloseAll();
-        monitoring_page.ActivateGameObject();
     }
     #endregion
 
