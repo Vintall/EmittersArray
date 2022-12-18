@@ -55,7 +55,10 @@ public class SimulationController : MonoBehaviour
         }
     }
     List<Transform> emitters = new List<Transform>();
-    
+    public List<Transform> Emitters => emitters;
+    public int EmittersCount => emitters.Count;
+
+
     void OnTimeScaleChanged(string key)
     {
         if (key != "Time Scale")

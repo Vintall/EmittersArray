@@ -40,9 +40,7 @@ Shader "Custom/InterferenceShader"
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-
             float result = 0;
-
             float2 uv = -(IN.uv_MainTex - 0.5) * _sheet_size + _sheet_position; // pixel world position
 
             float amplitude = 1. / _antenna_count;   // aka 'A'

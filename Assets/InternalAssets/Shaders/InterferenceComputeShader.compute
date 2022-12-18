@@ -1,0 +1,63 @@
+#pragma kernel CSMain
+
+RWTexture2D<float4> Result;
+float time;
+
+float2 texture_size; // world size
+float2 resolution; // pixel size
+
+struct Emitter
+{
+    float2 position;
+    float wave_length;
+    float wave_period;
+    float phase_shift;
+};
+
+int emitters_count;
+RWStructuredBuffer<Emitter> emitters;
+bool switcher;
+
+float4 max_amplitude_color;
+float4 min_amplitude_color;
+#define PI 3.1415926
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float result = 0;
+
+    float2 uv = float2(texture_size.x * (0.5 - id.x/resolution.x), texture_size.y * (0.5 - id.y/resolution.y)); //-(id.x - 0.5) * _sheet_size; // pixel world position
+
+    float amplitude = 1. / emitters_count;   // aka 'A'
+    float wave_number;                      // aka 'k' in math
+    float angular_frequency;                // aka 'w' in math
+    float radius;                           // distance from emitter to any interference point
+
+
+    for (int i = 0; i < emitters_count; i++)
+    {
+        Emitter emitter = emitters[i];
+
+        if (emitter.wave_length == 0 || emitter.wave_period == 0)
+            continue;
+
+        radius = sqrt((uv.x - emitter.position.x)*(uv.x - emitter.position.x) + (uv.y - emitter.position.y)*(uv.y - emitter.position.y));
+        wave_number = 2 * PI / emitter.wave_length;
+        angular_frequency = 2 * PI / emitter.wave_period;
+        
+
+        float real_time = time * 20; // Make a '1' equal to second
+
+        float sin_clear = amplitude * sin(wave_number * radius - real_time * angular_frequency + emitter.phase_shift); // energy from current emitter
+
+        result += sin_clear;
+    }
+    float4 max = max_amplitude_color * result;
+    float4 min = min_amplitude_color * (1 - result);
+    float4 total = max + min;
+
+
+    Result[id.xy] = total;
+
+    switcher = true;
+}
